@@ -9,8 +9,8 @@ import java.util.Set;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "username")
-@ToString(of = {"id", "username", "email", "firstName", "lastName", "enabled"})
+@EqualsAndHashCode
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -25,7 +25,7 @@ public class User {
     private String name;
 
     @Column(nullable = false,unique = true,length = 50)
-    private String username;
+    private String username;//login
 
     @Column(nullable = false)
     private String password;
@@ -53,7 +53,7 @@ public class User {
     @EqualsAndHashCode.Exclude
     private Set<Role> roles = new HashSet<>();
 
-    //методя для добавления/удаления ролей
+    //методы для добавления/удаления ролей
     public void addRole(Role role) {
         this.roles.add(role);
         role.getUsers().add(this); // работает, если геттер сгенерирован Lombok
@@ -63,32 +63,4 @@ public class User {
         this.roles.remove(role);
         role.getUsers().remove(this);
     }
-
-
-//    @Override
-//    public boolean equals(Object o){
-//        if(this == o) return true;
-//        if(o == null || getClass() != o.getClass()) return false;
-//        User user = (User) o;
-//        return Objects.equals(username, user.username);
-//    }
-//
-//    @Override
-//    public int hashCode(){
-//        return Objects.hash(username); //хешируем по username
-//    }
-//
-//    @Override
-//    public String toString() {
-//        // Не выводим пароль и связанные сущности, чтобы избежать лишней информации и рекурсии
-//        return "User +
-//                "id=" + id +
-//                ", username='" + username + '\'' +
-//                ", email='" + email + '\'' +
-//                ", firstName='" + firstName + '\'' +
-//                ", lastName='" + lastName + '\'' +
-//                ", enabled=" + enabled +
-//                ", rolesCount=" + (roles != null ? roles.size() : 0) +
-//                '}';
-//    }
 }

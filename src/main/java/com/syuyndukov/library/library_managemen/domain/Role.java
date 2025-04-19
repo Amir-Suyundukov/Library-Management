@@ -8,8 +8,8 @@ import java.util.Set;
 
 @Getter
 @Setter
-@EqualsAndHashCode(of = "name")//сравниваем по имени
-@ToString(of = {"id", "name"})//не влючаем user или permission
+@EqualsAndHashCode
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -23,7 +23,7 @@ public class Role {
     @Column(name = "name",nullable = false, unique = true, length = 50)
     private String name;
 
-    @ManyToMany(fetch = FetchType.EAGER)//тип загрузки(начнем с EAGER для простаты , при надобности перейдем в LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)//тип загрузки(начнем с EAGER для простаты, при надобности перейдем в LAZY)
     @JoinTable(//описываем связующую таблицу для ManyToMany(JPA)
     name = "role_permission",
     joinColumns = @JoinColumn(name = "role_id"),
@@ -57,27 +57,4 @@ public class Role {
         return users;
     }
 
-
-//    @Override
-//    public boolean equals(Object o){
-//        if (this==o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//        Role role = (Role) o;
-//        return Objects.equals(name,role.name);//сравниваем по имени
-//    }
-//
-//    @Override
-//    public int hashCode(){
-//        return Objects.hash(name);
-//    }
-//
-//    @Override
-//    public String toString() {
-//        // Избегаем рекурсии при выводе связанных сущностей (особенно users)
-//        return "Role{" +
-//                "id=" + id +
-//                ", name='" + name + '\'' +
-//                ", permissionsCount=" + (permissions != null ? permissions.size() : 0) + // Просто количество
-//                '}';
-//    }
 }

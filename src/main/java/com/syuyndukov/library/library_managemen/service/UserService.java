@@ -1,6 +1,8 @@
 package com.syuyndukov.library.library_managemen.service;
 
 import com.syuyndukov.library.library_managemen.domain.User;
+import com.syuyndukov.library.library_managemen.dto.UserResponseDto;
+import com.syuyndukov.library.library_managemen.dto.UserUpdateDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,8 @@ public interface UserService {
     Optional<User> findByUsername(String username);
 
     List<User> findAllUsers();
+
+    UserResponseDto updateUser(Long id, UserUpdateDto userUpdateDto);
 
     void deleteUser(Long id);
 

@@ -4,6 +4,7 @@ import com.syuyndukov.library.library_managemen.domain.Role;
 import com.syuyndukov.library.library_managemen.domain.User;
 import com.syuyndukov.library.library_managemen.dto.UserCreateDto;
 import com.syuyndukov.library.library_managemen.dto.UserResponseDto;
+import com.syuyndukov.library.library_managemen.dto.UserUpdateDto;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class UserMapper {
+
     public User toEntity(UserCreateDto dto){
         if(dto == null){
             return null;
@@ -61,4 +63,22 @@ public class UserMapper {
                 .map(this::toDto)//для каждого User вызываем toDto
                 .collect(Collectors.toList());//собираем в лист
     }
+
+    public void updateEntityFromDto(UserUpdateDto dto, User user) {
+        if (dto == null || user == null) {
+            return;
+        }
+        if (dto.getEmail() != null) {
+            user.setEmail(dto.getEmail());
+        }
+        if (dto.getFirstName() != null) {
+            user.setFirstName(dto.getFirstName());
+        }
+        if (dto.getLastName() != null) {
+            user.setLastName(dto.getLastName());
+        }
+
+        user.setEnabled(dto.isEnabled());
+    }
+    
 }

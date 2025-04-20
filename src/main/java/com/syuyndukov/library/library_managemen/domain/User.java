@@ -28,7 +28,7 @@ public class User {
     private String username;//login
 
     @Column(nullable = false)
-    private String password;
+    private String passwordHash;
 
     @Column(nullable = false,unique = true, length = 50)
     private String email;

@@ -1,6 +1,7 @@
 package com.syuyndukov.library.library_managemen.service;
 
 import com.syuyndukov.library.library_managemen.domain.User;
+import com.syuyndukov.library.library_managemen.dto.UserCreateDto;
 import com.syuyndukov.library.library_managemen.dto.UserResponseDto;
 import com.syuyndukov.library.library_managemen.dto.UserUpdateDto;
 
@@ -9,13 +10,13 @@ import java.util.Optional;
 
 public interface UserService {
 
-    User createUser(User user);
+    UserResponseDto createUser(UserCreateDto userDto);
 
-    Optional<User> findById(Long id);
+    Optional<UserResponseDto> findById(Long id);
 
-    Optional<User> findByUsername(String username);
+    Optional<UserResponseDto> findByUsername(String username);
 
-    List<User> findAllUsers();
+    List<UserResponseDto> findAllUsers();
 
     UserResponseDto updateUser(Long id, UserUpdateDto userUpdateDto);
 

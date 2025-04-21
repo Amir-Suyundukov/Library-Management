@@ -1,5 +1,6 @@
 package com.syuyndukov.library.library_managemen.dto;
 
+import com.syuyndukov.library.library_managemen.domain.User;
 import lombok.*;
 
 import java.util.Set;
@@ -9,14 +10,12 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserResponseDto {
-
+public class UserResponseDto extends User {
     private Long id;
     private String username;
     private String email;
     private String firstName;
     private String lastName;
     private boolean enabled;
-
     private Set<String> roles;
 }

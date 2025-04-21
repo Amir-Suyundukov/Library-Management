@@ -1,5 +1,6 @@
 package com.syuyndukov.library.library_managemen.impl;
 
+import com.syuyndukov.library.library_managemen.domain.Role;
 import com.syuyndukov.library.library_managemen.domain.User;
 import com.syuyndukov.library.library_managemen.dto.UserCreateDto;
 import com.syuyndukov.library.library_managemen.dto.UserResponseDto;
@@ -33,63 +34,96 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional // Этот метод изменяет данные, поэтому должна быть транзакция на запись
     public UserResponseDto createUser(UserCreateDto userDto) {
+        //TODO: реализовать проверку на уникальность username и email перед созданием,
+        //TODO: чтобы предотвратить ошибки базы данных и предоставить более понятное сообщение
 
-        User user = userMapper.toEntity(userCreateDto);
+        User user = userMapper.toEntity(userDto);
 
-        String rawPassword = userCreateDto.getPassword();
-        String encoderPass = passwordEncoder.encode(rawPassword);
-        user.setPasswordHash(encoderPass);
+        String rawPassword = userDto.getPassword();
+        String encPassword = passwordEncoder.encode(rawPassword);
+        user.setPasswordHash(encPassword);
+
+        user.setEnabled(true);
+        // TODO: Возможно, эту логику стоит вынести или сделать более гибкой
+        //  (например, принимать список ролей в DTO для админа)
+
+        // TODO: Обработать случай, если роль READER не найдена
+        //  (например, создать ее при старте приложения или кинуть исключение)
 
         User savedUser = userRepository.save(user);
+
         return userMapper.toDto(savedUser);
     }
 
+
     @Override
-    public User createUser(User user) {
-        return null;
+    public Optional<UserResponseDto> findById(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        return userOptional.map(userMapper::toDto);
     }
 
     @Override
-    public Optional<User> findById(Long id) {
-        return Optional.empty();
+    public Optional<UserResponseDto> findByUsername(String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        return userOptional.map(userMapper::toDto);
     }
 
     @Override
-    public Optional<User> findByUsername(String username) {
-        return Optional.empty();
+    public List<UserResponseDto> findAllUsers() {
+        List<User> users = userRepository.findAll();
+        return userMapper.toDtoList(users);
     }
 
     @Override
-    public List<User> findAllUsers() {
-        return List.of();
-    }
-
-    @Override
+    @Transactional
     public UserResponseDto updateUser(Long id, UserUpdateDto userUpdateDto) {
-        Optional<User> userOptional = userRepository.findById(id);// находим пользователя по id
+        Optional<User> userOptional = userRepository.findById(id);
 
-        if (!userOptional.isPresent()){//если пользователь не найден выкидываем исключение
-            throw new RuntimeException("User nit found with id: " + id);
-        }
+        // TODO: Использовать свое кастомное исключение UserNotFoundException
+        User userToUpdate = userOptional.orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        // TODO: Добавить проверки прав доступа! Например, только ADMIN может менять enabled,
+        // TODO: или пользователь может менять только СВОЙ профиль.
+        // TODO: Эту логику можно добавить здесь или на уровне сервисного слоя выше,
+        // TODO: или на уровне контроллера с помощью аннотаций Spring Security (@PreAuthorize).
 
-        User userToUpdate = userOptional.get();// получаем сущность User из Optional
-
-        userMapper.updateEntityFromDto(userUpdateDto ,userToUpdate);
-        return null;
+        userMapper.updateEntityFromDto(userUpdateDto, userToUpdate);
+        return userMapper.toDto(userToUpdate);
     }
 
     @Override
     public void deleteUser(Long id) {
+        userRepository.deleteById(id);
     }
 
     @Override
-    public User assignRoleToUser(Long userId, String roleName) {
-        return null;
+    @Transactional
+    public UserResponseDto assignRoleToUser(Long userId, String roleName) {
+        // TODO: Использовать свое кастомное исключение UserNotFoundException
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        // TODO: Использовать свое кастомное исключение RoleNotFoundException
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found with name: " + roleName));
+
+        user.addRole(role);
+        return userMapper.toDto(user);
     }
 
     @Override
+    @Transactional
     public User removeRoleFromUser(Long userId, String roleName) {
-        return null;
+        // TODO: Использовать свое кастомное исключение UserNotFoundException
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+        // TODO: Использовать свое кастомное исключение RoleNotFoundException
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found with name: " + roleName));
+
+        user.removeRole(role);
+
+        return userMapper.toDto(user);
     }
 
 //    @Override
@@ -97,4 +131,6 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findEntityByUsername(String username){
         return userRepository.findByUsername(username);
     }
+
+    // TODO: Добавить метод для изменения пароля!
 }

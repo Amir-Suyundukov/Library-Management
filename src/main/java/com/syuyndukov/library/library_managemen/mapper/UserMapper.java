@@ -1,6 +1,5 @@
 package com.syuyndukov.library.library_managemen.mapper;
 
-import com.syuyndukov.library.library_managemen.domain.Role;
 import com.syuyndukov.library.library_managemen.domain.User;
 import com.syuyndukov.library.library_managemen.dto.UserCreateDto;
 import com.syuyndukov.library.library_managemen.dto.UserResponseDto;
@@ -15,8 +14,8 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
 
-    public User toEntity(UserCreateDto dto){
-        if(dto == null){
+    public User toEntity(UserCreateDto dto) {
+        if (dto == null) {
             return null;
         }
         User user = new User();
@@ -31,8 +30,8 @@ public class UserMapper {
         return user;
     }
 
-    public UserResponseDto toDto(User user){
-        if(user == null){
+    public UserResponseDto toDto(User user) {
+        if (user == null) {
             return null;
         }
 
@@ -44,20 +43,20 @@ public class UserMapper {
         dto.setLastName(user.getLastName());
         dto.setEnabled(user.isEnabled());
 
-        if(user.getRoles() != null) {
+        if (user.getRoles() != null) {
             Set<String> roleName = user.getRoles().stream()
                     .map(role -> role.getName())
                     .collect(Collectors.toSet());
             dto.setRoles(roleName);
-        }else {
+        } else {
             dto.setRoles(new HashSet<>());//если нет ролей или null
         }
         //Пароль в (ХЕШ) не копируем в DTO
         return dto;
     }
 
-    public List<UserResponseDto> toDtoList(List<User> list){
-        if(list == null){
+    public List<UserResponseDto> toDtoList(List<User> list) {
+        if (list == null) {
             return null;
         }
         return list.stream()
@@ -81,5 +80,5 @@ public class UserMapper {
 
         user.setEnabled(dto.isEnabled());
     }
-    
+
 }

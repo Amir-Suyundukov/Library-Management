@@ -1,6 +1,5 @@
 package com.syuyndukov.library.library_managemen.dto;
 
-import com.syuyndukov.library.library_managemen.domain.User;
 import lombok.*;
 
 import java.util.Set;

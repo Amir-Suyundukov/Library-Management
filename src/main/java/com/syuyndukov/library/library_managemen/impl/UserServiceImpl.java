@@ -9,9 +9,9 @@ import com.syuyndukov.library.library_managemen.mapper.UserMapper;
 import com.syuyndukov.library.library_managemen.repository.RoleRepository;
 import com.syuyndukov.library.library_managemen.repository.UserRepository;
 import com.syuyndukov.library.library_managemen.service.UserService;
-import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User removeRoleFromUser(Long userId, String roleName) {
+    public UserResponseDto removeRoleFromUser(Long userId, String roleName) {
         // TODO: Использовать свое кастомное исключение UserNotFoundException
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
@@ -126,9 +126,9 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user);
     }
 
-//    @Override
+    //    @Override
 //    @Transactional(readOnly = true)
-    public Optional<User> findEntityByUsername(String username){
+    public Optional<User> findEntityByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 

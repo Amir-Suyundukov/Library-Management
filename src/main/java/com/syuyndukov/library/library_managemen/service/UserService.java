@@ -22,9 +22,9 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    User assignRoleToUser(Long userId, String roleName);
+    UserResponseDto assignRoleToUser(Long userId, String roleName);
 
-    User removeRoleFromUser(Long userId, String roleName);
+    UserResponseDto removeRoleFromUser(Long userId, String roleName);
 
 
 }

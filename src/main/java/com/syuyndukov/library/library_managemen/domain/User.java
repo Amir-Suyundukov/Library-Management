@@ -6,9 +6,6 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.syuyndukov.library.library_managemen.domain.Role;
-import com.syuyndukov.library.library_managemen.domain.Permission;
-import com.syuyndukov.library.library_managemen.domain.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
@@ -80,9 +77,10 @@ public class User implements UserDetails {
         Set<GrantedAuthority> authorities = new HashSet<>();
         // 1. Добавляем роли как GrantedAuthority. Spring Security часто использует префикс "ROLE_"
         if (this.roles != null){
-            this.roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName())));
+            this.roles.forEach(role -> {authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()));
             // 2. Добавляем права (permissions) как GrantedAuthority.
-//            role.getPermissions().forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission.getName())));
+            role.getPermissions().forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission.getName())));
+        });
         }
 
         return authorities;

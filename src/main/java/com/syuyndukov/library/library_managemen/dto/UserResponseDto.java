@@ -10,7 +10,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class UserResponseDto extends User {
+public class UserResponseDto{
     private Long id;
     private String username;
     private String email;

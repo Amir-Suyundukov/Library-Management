@@ -35,6 +35,7 @@ public class UserMapper {
         if(user == null){
             return null;
         }
+
         UserResponseDto dto = new UserResponseDto();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
@@ -45,7 +46,7 @@ public class UserMapper {
 
         if(user.getRoles() != null) {
             Set<String> roleName = user.getRoles().stream()
-                    .map(Role::getName)
+                    .map(role -> role.getName())
                     .collect(Collectors.toSet());
             dto.setRoles(roleName);
         }else {

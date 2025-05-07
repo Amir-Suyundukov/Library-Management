@@ -14,7 +14,7 @@ public interface UserService {
 
     Optional<UserResponseDto> findById(Long id);
 
-    Optional<UserResponseDto> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
     List<UserResponseDto> findAllUsers();
 

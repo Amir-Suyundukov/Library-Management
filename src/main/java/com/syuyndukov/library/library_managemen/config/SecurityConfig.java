@@ -1,8 +1,12 @@
 package com.syuyndukov.library.library_managemen.config;
 
+import com.syuyndukov.library.library_managemen.service.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,17 +21,36 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    // 2. Наш UserDetailsService. Spring Security будет его использовать для загрузки UserDetails по логину.
+    // Spring Boot часто найдет его сам, если он помечен @Service, но явное объявление тут полезно.
+    // Мы внедряем сюда наш CustomUserDetailsService (который сам внедряет наш UserService)
+    @Bean
+    public UserDetailsService userDetailsService(CustomUserDetailsService customUserDetailsService){
+        return customUserDetailsService;
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder){
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(userDetailsService);// Указываем, как найти пользователя
+        authenticationProvider.setPasswordEncoder(passwordEncoder);// Указываем как проверить роль
+
+        return authenticationProvider;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                //TODO: определить правила доступа для разных URL
-                                // Пример: разрешить всем доступ к главной странице и странице входа
-                                // .requestMatchers("/", "/login").permitAll()
-                                // .requestMatchers("/admin/**").hasRole("ADMIN") // Только для пользователей с ролью ADMIN
-                                // .requestMatchers("/books/**").hasAnyRole("ADMIN", "LIBRARIAN", "READER") // Для нескольких ролей
-                                // .requestMatchers("/users/**").hasAuthority("USER_WRITE") // Только для тех, у кого есть право USER_WRITE
-                                // А все остальные запросы требуют аутентификации
+                                .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll() // Главная, логин, регистрация, статика (CSS/JS/картинки)
+                                .requestMatchers("/books", "/books/{id}").permitAll()//каталог книг
+                                .requestMatchers("/admin/**").hasRole("ADMIN") // URL, начинающиеся с /admin/ доступны только ADMIN
+                                .requestMatchers("/users/**").hasRole("ADMIN") // CRUD пользователей только ADMIN
+                                .requestMatchers("/roles/**").hasRole("ADMIN") // CRUD ролей только ADMIN
+                                .requestMatchers("/permission/**").hasRole("ADMIN")
+
+                                .requestMatchers("/books/new", "/books/{id}/edit", "/books/{id}/delete").hasAnyRole("ADMIN", "LIBRARIAN")
                                 .anyRequest().authenticated())// ПОКА ЧТО: ВСЕ ЗАПРОСЫ ТРЕБУЮТ АУТЕНТИФИКАЦИИ
                 //2. Настройка формы входа
                 .formLogin(formLogin -> formLogin

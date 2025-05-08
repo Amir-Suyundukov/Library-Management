@@ -39,6 +39,8 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.toEntity(userDto);
 
+        user.setName(userDto.getUsername());
+
         String rawPassword = userDto.getPassword();
         String encPassword = passwordEncoder.encode(rawPassword);
         user.setPasswordHash(encPassword);

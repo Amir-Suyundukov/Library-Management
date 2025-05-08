@@ -30,7 +30,7 @@ public class User implements UserDetails {
     @Column(nullable = false,unique = true,length = 50)
     private String username;//login
 
-    @Column(nullable = false)
+    @Column(nullable = false ,name = "password")
     private String passwordHash;
 
     @Column(unique = true, length = 50)
@@ -88,7 +88,7 @@ public class User implements UserDetails {
 
     @Override
     public String getPassword() {
-        return "";
+        return this.passwordHash;
     }
 
     @Override

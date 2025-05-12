@@ -3,9 +3,11 @@ package com.syuyndukov.library.library_managemen.config;
 import com.syuyndukov.library.library_managemen.service.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,9 +43,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+//                .csrf(csrf -> csrf.disable()); отключает защиту csrf
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/", "/login", "/register", "/css/**", "/js/**", "/images/**").permitAll() // Главная, логин, регистрация, статика (CSS/JS/картинки)
+                                .requestMatchers(HttpMethod.POST, "/register").permitAll()
                                 .requestMatchers("/books", "/books/{id}").permitAll()//каталог книг
                                 .requestMatchers("/admin/**").hasRole("ADMIN") // URL, начинающиеся с /admin/ доступны только ADMIN
                                 .requestMatchers("/users/**").hasRole("ADMIN") // CRUD пользователей только ADMIN
@@ -52,11 +56,19 @@ public class SecurityConfig {
 
                                 .requestMatchers("/books/new", "/books/{id}/edit", "/books/{id}/delete").hasAnyRole("ADMIN", "LIBRARIAN")
                                 .anyRequest().authenticated())// ПОКА ЧТО: ВСЕ ЗАПРОСЫ ТРЕБУЮТ АУТЕНТИФИКАЦИИ
+
+
                 //2. Настройка формы входа
+
+
                 .formLogin(formLogin -> formLogin
+                        .defaultSuccessUrl("/", true)
                         // TODO: Настроить свою страницу входа и перенаправления
                         .permitAll())
-                .logout(logout -> logout.permitAll()); // TODO: Настроить URL выхода и перенаправления
+                .logout(logout -> logout.permitAll()
+                ); // TODO: Настроить URL выхода и перенаправления
+
+
         // 4. Отключение CSRF защиты (ТОЛЬКО ДЛЯ ПРИМЕРОВ API БЕЗ UI, ДЛЯ UI ОБЫЧНО ВКЛЮЧЕНА!)
         // Для веб-приложения с Thymeleaf CSRF должен быть ВКЛЮЧЕН по умолчанию!
         // Если вдруг отключаешь (для тестов API без токенов), то так:
@@ -66,7 +78,16 @@ public class SecurityConfig {
         // .exceptionHandling(...)
 
         // Строим и возвращаем фильтр-цепочку безопасности
+
+
         return http.build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        // Эта настройка говорит Spring Security полностью игнорировать запросы к /error.
+        // Это позволяет стандартному обработчику ошибок Spring Boot работать.
+        return (web) -> web.ignoring().requestMatchers("/error");
     }
     // --- TODO: Нужен Bean UserDetailsService для загрузки пользователя по логину ---
     // Spring Security нужно знать, как получить данные пользователя (Username, PasswordHash, Enabled, Authorities)

@@ -29,11 +29,12 @@ public class LibraryManagementApplication {
 	}
 
 	// метод выполняется после старта приложения
-//	@Profile("dev")
 	// Опционально: запускать этот код только в dev профиле, чтобы не создавать тестовых пользователей в проде
 	@PostConstruct
+	@Profile("dev")
 	public void setupInitialData() {
 		System.out.println("Создание начальных данных (тестового пользователя)...");
+
 		createRoleIfNotFound("ADMIN");
 		createRoleIfNotFound("LIBRARIAN");
 		createRoleIfNotFound("READER");
@@ -48,11 +49,17 @@ public class LibraryManagementApplication {
 			adminCreate.setFirstName("Super");
 			adminCreate.setLastName("Admin");
 
-			UserResponseDto createAdmin = userService.createUser(adminCreate);
-
 			try {
-				userService.assignRoleToUser(createAdmin.getId(), "ADMIN");
+				UserResponseDto userCreateDto = userService.createUser(adminCreate);//создаем пользователя через сервис и получаем dto и id
+
+				//НАЗНАЧАЕМ РОЛЬ
+				//получаем ID только что созданного пользователя из DTO
+				Long adminUserId = userCreateDto.getId();
+
+				userService.assignRoleToUser(adminUserId, "ADMIN");//назначаем роль
+
 				System.out.println("Тестовый пользователь 'admin' создан и назначена роль ADMIN");
+
 			} catch (RuntimeException e) {
 				System.err.println("Ошибка при назначении роли ADMIN пользователю 'admin': " + e.getMessage());
 			}

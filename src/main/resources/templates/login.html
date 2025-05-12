@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход в библиотеку</title>
+    <link rel="stylesheet" href="/css/style.css"> <!-- Пример подключения CSS -->
+</head>
+<body>
+<h1>Вход в систему Управления Библиотекой</h1>
+
+<!-- Отображение сообщения об успешной регистрации (передается через RedirectAttributes) -->
+<div th:if="${successMessage}" style="color: green;">
+    <p th:text="${successMessage}"></p>
+</div>
+
+<!-- Отображение сообщения об ошибке входа (добавляется Spring Security к URL ?error) -->
+<div th:if="${param.error}" style="color: red;">
+    <p>Неверный логин или пароль.</p>
+</div>
+
+<!-- Отображение сообщения после выхода (добавляется Spring Security к URL ?logout) -->
+<div th:if="${param.logout}" style="color: green;">
+    <p>Вы успешно вышли из системы.</p>
+</div>
+
+
+<!-- Форма входа -->
+<!-- Форма отправляется на URL /login методом POST. -->
+<!-- Spring Security сам перехватит этот запрос и выполнит аутентификацию. -->
+<form action="/login" method="post">
+    <!-- CSRF токен (обязателен при включённой защите) -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+    <div>
+        <label for="username">Логин:</label>
+        <input type="text" id="username" name="username" required>
+    </div>
+    <div>
+        <label for="password">Пароль:</label>
+        <input type="password" id="password" name="password" required>
+    </div>
+    <div>
+        <button type="submit">Войти</button>
+    </div>
+</form>
+
+<p>Еще нет аккаунта? <a href="/register">Зарегистрироваться</a></p>
+
+</body>
+</html>

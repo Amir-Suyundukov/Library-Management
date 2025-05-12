@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Главная страница</title>
+</head>
+<body>
+<h1>Добро пожаловать в Библиотеку!</h1>
+
+<!-- Пример вывода имени пользователя (если он залогинен) -->
+<!-- ${#request.userPrincipal?.name} получает логин аутентифицированного пользователя из Spring Security -->
+<div sec:authorize="isAuthenticated()"> <!-- Этот блок виден только аутентифицированным пользователям -->
+    <p>Привет, <span sec:authentication="name">User</span>!</p> <!-- sec:authentication="name" выводит логин -->
+    <!-- sec:authorize="hasRole('ADMIN')" --> <!-- Этот блок виден только админам -->
+    <p>Вы успешно вошли как <span sec:authentication="principal.authorities">Roles</span>.</p> <!-- Вывод ролей/прав -->
+</div>
+
+<div sec:authorize="isAnonymous()"> <!-- Этот блок виден только неаутентифицированным (анонимным) пользователям -->
+    <p>Пожалуйста, <a href="/login">войдите</a> или <a href="/register">зарегистрируйтесь</a>.</p>
+</div>
+
+<!-- Форма выхода -->
+<!-- Spring Security по умолчанию обрабатывает POST запрос на /logout -->
+<form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+    <button type="submit">Выйти</button>
+</form>
+
+<!-- TODO: Добавить ссылки на каталог книг, профиль, админку (если есть права) -->
+
+</body>
+</html>

@@ -46,11 +46,24 @@ public class UserServiceImpl implements UserService {
         user.setPasswordHash(encPassword);
 
         user.setEnabled(true);
+
         // TODO: Возможно, эту логику стоит вынести или сделать более гибкой
         //  (например, принимать список ролей в DTO для админа)
 
         // TODO: Обработать случай, если роль READER не найдена
         //  (например, создать ее при старте приложения или кинуть исключение)
+
+        Optional<Role> roleOptional = roleRepository.findByName("READER");
+
+        if(roleOptional.isPresent()){
+            user.addRole(roleOptional.get());
+            System.out.println("Назначена роль READER пользователю " + user.getUsername());
+        }else {
+            // TODO: Обработать случай, если роль READER не найдена (например, создать ее при старте приложения или кинуть исключение?)
+            //  Так как мы создаем роли в @PostConstruct, этот случай менее вероятен после первого запуска.
+            //  Только нах это делать если роль создаются при старте приложения
+            System.err.println("Внимание: Роль 'READER' не найдена! Пользователь создан без роли READER.");
+        }
 
         User savedUser = userRepository.save(user);
 

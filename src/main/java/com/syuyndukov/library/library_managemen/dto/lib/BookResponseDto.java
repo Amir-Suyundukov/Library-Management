@@ -17,5 +17,5 @@ public class BookResponseDto {
     private Integer publicationYear;
     private Integer copies;
 
-    private Set<AuthorCreationDto> authors;
+    private Set<AuthorResponseDto> authors;
 }

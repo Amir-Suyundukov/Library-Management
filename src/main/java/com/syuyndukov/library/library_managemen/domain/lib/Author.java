@@ -9,8 +9,8 @@ import java.util.Set;
 
 @Getter
 @Setter
-@EqualsAndHashCode(exclude = "books") // Исключаем коллекцию из equals/hashCode
-@ToString(exclude = "books") // Исключаем коллекцию из toString
+@EqualsAndHashCode
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity

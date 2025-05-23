@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Список Авторов</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<h1>Список Авторов</h1>
+
+<!-- Сообщения (успех/ошибка) -->
+<div th:if="${successMessage}" style="color: green;"><p th:text="${successMessage}"></p></div>
+<div th:if="${errorMessage}" style="color: red;"><p th:text="${errorMessage}"></p></div>
+
+<!-- Ссылка на создание нового автора (видна только тем, кто имеет права) -->
+<div sec:authorize="hasAnyRole('ADMIN', 'LIBRARIAN')">
+    <p><a href="/authors/new">Добавить нового автора</a></p>
+</div>
+
+<!-- Таблица со списком авторов -->
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>ФИО</th>
+        <th>Действия</th> <!-- Столбец для ссылок на детали, редактирование, удаление -->
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Перебираем список авторов из модели -->
+    <tr th:each="author : ${authors}">
+        <td th:text="${author.id}">1</td> <!-- Отображаем ID -->
+        <td th:text="${author.fullName}">Иван Иванов</td> <!-- Отображаем ФИО -->
+        <td>
+            <!-- Ссылка на детали автора -->
+            <a th:href="@{/authors/{id}(id=${author.id})}">Подробнее</a>
+
+            <!-- Ссылки на редактирование и удаление (видны только тем, кто имеет права) -->
+            <span sec:authorize="hasAnyRole('ADMIN', 'LIBRARIAN')">
+                         | <a th:href="@{/authors/{id}/edit(id=${author.id})}">Редактировать</a>
+                         | <form th:action="@{/authors/{id}/delete(id=${author.id})}" method="post" style="display:inline;">
+                             <!-- CSRF токен -->
+                             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button type="submit" onclick="return confirm('Вы уверены?');">Удалить</button>
+                         </form>
+                    </span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<p><a href="/">На главную</a></p>
+
+</body>
+</html>

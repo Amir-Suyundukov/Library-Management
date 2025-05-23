@@ -28,6 +28,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Transactional
     public AuthorResponseDto createAuthor(AuthorCreationDto authorDto) {
         Author author = authorMapper.toEntity(authorDto);
         Author saveAuthor = authorRepository.save(author);
@@ -57,6 +58,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Transactional
     public AuthorResponseDto updateAuthor(Long id, AuthorUpdateDto authorDetails) {
         Author authorToUpdate = authorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
@@ -67,6 +69,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Transactional
     public void deleteAuthor(Long id) {
         authorRepository.deleteById(id);
     }

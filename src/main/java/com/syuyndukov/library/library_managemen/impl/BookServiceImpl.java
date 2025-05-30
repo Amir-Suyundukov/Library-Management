@@ -36,17 +36,19 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public BookResponseDto createBook(BookCreationDto bookDto) {
         Book book = bookMapper.toEntity(bookDto);
 
         Set<Author> authors = new HashSet<>();
-        if (bookDto.getAuthorsIds() == null && !bookDto.getAuthorsIds().isEmpty()){
-            authors = bookDto.getAuthorsIds().stream().map(authorId -> authorRepository.findById(authorId)
+        if (bookDto.getAuthorIds() == null && !bookDto.getAuthorIds().isEmpty()){
+            authors = bookDto.getAuthorIds().stream().map(authorId -> authorRepository.findById(authorId)
                     .orElseThrow(() -> new RuntimeException("Author not found with id: " + authorId)))
                     .collect(Collectors.toSet());
-        }else {
-            throw new RuntimeException("Book must have at least one author.");
         }
+//        else {
+//            throw new RuntimeException("У книги должно быть хотя бы 1 автор (BookServiceImpl.createBook)");
+//        }
         authors.forEach(book::addAuthor);
         Book savedBook = bookRepository.save(book);
         return bookMapper.toDto(savedBook);
@@ -75,17 +77,18 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public BookResponseDto updateBook(Long id, BookUpdateDto bookDetails) {
         Book bookToUpdate = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
 
         bookMapper.updateEntityFromDto(bookDetails, bookToUpdate);
 
-        if (bookDetails.getAuthorsIds() == null || bookDetails.getAuthorsIds().isEmpty()) {
+        if (bookDetails.getAuthorIds() == null || bookDetails.getAuthorIds().isEmpty()) {
             throw new RuntimeException("Book must have at least one author after update.");
         }
 
-        Set<Author> authors = bookDetails.getAuthorsIds().stream()
+        Set<Author> authors = bookDetails.getAuthorIds().stream()
                 .map(authorId -> authorRepository.findById(authorId)
                         .orElseThrow(() -> new RuntimeException("Author not found with id: " + authorId)))
                 .collect(Collectors.toSet());
@@ -98,6 +101,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public void deleteBook(Long id) {
         bookRepository.deleteById(id);
     }

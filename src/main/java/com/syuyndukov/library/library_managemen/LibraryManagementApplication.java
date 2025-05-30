@@ -4,6 +4,9 @@ import com.syuyndukov.library.library_managemen.domain.Role;
 import com.syuyndukov.library.library_managemen.domain.User;
 import com.syuyndukov.library.library_managemen.dto.UserCreateDto;
 import com.syuyndukov.library.library_managemen.dto.UserResponseDto;
+import com.syuyndukov.library.library_managemen.dto.lib.AuthorCreationDto;
+import com.syuyndukov.library.library_managemen.dto.lib.AuthorResponseDto;
+import com.syuyndukov.library.library_managemen.service.AuthorService;
 import com.syuyndukov.library.library_managemen.service.RoleService;
 import com.syuyndukov.library.library_managemen.service.UserService;
 import jakarta.annotation.PostConstruct;
@@ -18,11 +21,13 @@ public class LibraryManagementApplication {
 
 	private final UserService userService;
 	private final RoleService roleService;
+	private final AuthorService authorService;
 
-	public LibraryManagementApplication(UserService userService, RoleService roleService) {
+	public LibraryManagementApplication(UserService userService, RoleService roleService, AuthorService authorService) {
 		this.userService = userService;
 		this.roleService = roleService;
-	}
+        this.authorService = authorService;
+    }
 
 	public static void main(String[] args) {
 		SpringApplication.run(LibraryManagementApplication.class, args);
@@ -39,6 +44,7 @@ public class LibraryManagementApplication {
 		createRoleIfNotFound("LIBRARIAN");
 		createRoleIfNotFound("READER");
 
+		createAnonymousAuthorIfNotFound("Анонимный Автор");
 		Optional<User> adminUser = userService.findByUsername("admin");
 
 		if (adminUser.isEmpty()) {
@@ -87,6 +93,22 @@ public class LibraryManagementApplication {
 			}
 		} else {
 			System.out.println("Роль '" + roleName + "' уже существует.");
+		}
+	}
+
+	private void createAnonymousAuthorIfNotFound(String fullName){
+		Optional<AuthorResponseDto> author = authorService.findByFullName(fullName);
+
+		if (author.isEmpty()){
+			try {
+				AuthorCreationDto authorCreationDto = new AuthorCreationDto(fullName);
+				authorService.createAuthor(authorCreationDto);
+				System.out.println("Анонимный автор '" + fullName + "' создан");
+			}catch (RuntimeException e){
+				System.err.println("Ошибка при создании анонимного автора '" + fullName + "': " + e.getMessage());
+			}
+		} else {
+			System.out.println("Анонимный автор '" + fullName + "' уже существует.");
 		}
 	}
 }

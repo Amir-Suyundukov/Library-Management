@@ -25,5 +25,7 @@ public class BookUpdateDto {
     @Min(value = 0, message = "Количество экземпляров не может быть отрицательным")
     private Integer copies;
 
-    private Set<Long> authorsIds = new HashSet<>();
+    private String isbn;
+
+    private Set<Long> authorIds = new HashSet<>();
 }

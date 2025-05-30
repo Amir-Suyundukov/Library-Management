@@ -32,9 +32,7 @@ public class BookCreationDto {
     @Min(value = 0, message = "Количество экземпляров не может быть отрицательным")
     private Integer copies;
 
-    @NotNull(message = "Должен быть указан хотя бы один автор") // Книга должна иметь автора
-    @Size(min = 1, message = "Должен быть указан хотя бы один автор")
-    private Set<Long> authorsIds = new HashSet<>();
-
-
+//    @NotNull(message = "Должен быть указан хотя бы один автор") // Книга должна иметь автора
+//    @Size(min = 1, message = "Должен быть указан хотя бы один автор")
+    private Set<Long> authorIds = new HashSet<>();
 }

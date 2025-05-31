@@ -175,4 +175,23 @@ public class BookController {
             return "redirect:/books/" + id + "/edit";
         }
     }
+
+    /**
+     * Удаляет книгу.
+     * Доступно ADMIN и LIBRARIAN.
+     */
+    @PostMapping("/{id}/delete")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    public String deleteBook(@PathVariable Long id, RedirectAttributes redirectAttributes){
+        try{
+            bookService.deleteBook(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Книга успешно удалена!");
+            System.out.println("Книга удалена: ID=" + id);
+
+        }catch (RuntimeException e){
+            System.err.println("Ошибка при удалении книги ID=" + id + ": " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении книги: " + e.getMessage());
+        }
+        return "redirect:/books";
+    }
 }

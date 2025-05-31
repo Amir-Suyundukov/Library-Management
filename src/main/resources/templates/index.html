@@ -1,31 +1,51 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
 <head>
     <meta charset="UTF-8">
     <title>Главная страница</title>
+    <!-- TODO: Добавить CSS, если есть -->
 </head>
 <body>
 <h1>Добро пожаловать в Библиотеку!</h1>
 
-<!-- Пример вывода имени пользователя (если он залогинен) -->
-<!-- ${#request.userPrincipal?.name} получает логин аутентифицированного пользователя из Spring Security -->
-<div sec:authorize="isAuthenticated()"> <!-- Этот блок виден только аутентифицированным пользователям -->
-    <p>Привет, <span sec:authentication="name">User</span>!</p> <!-- sec:authentication="name" выводит логин -->
-    <!-- sec:authorize="hasRole('ADMIN')" --> <!-- Этот блок виден только админам -->
-    <p>Вы успешно вошли как <span sec:authentication="principal.authorities">Roles</span>.</p> <!-- Вывод ролей/прав -->
+<!-- Приветственное сообщение с именем пользователя (если залогинен) -->
+<div sec:authorize="isAuthenticated()">
+    <p>Привет, <span sec:authentication="name">Пользователь</span>!</p>
+    <!-- TODO: Возможно, отобразить роль, как мы делали на предыдущем этапе -->
+    <!-- <p>Вы вошли как <span sec:authentication="principal.authorities">Роли</span>.</p> -->
 </div>
 
-<div sec:authorize="isAnonymous()"> <!-- Этот блок виден только неаутентифицированным (анонимным) пользователям -->
+<!-- Приглашение войти/зарегистрироваться (если не залогинен) -->
+<div sec:authorize="isAnonymous()">
     <p>Пожалуйста, <a href="/login">войдите</a> или <a href="/register">зарегистрируйтесь</a>.</p>
 </div>
 
-<!-- Форма выхода -->
-<!-- Spring Security по умолчанию обрабатывает POST запрос на /logout -->
+<hr> <!-- Горизонтальная линия для разделения -->
+
+<!-- --- ДОБАВЛЯЕМ ССЫЛКИ МЕНЮ --- -->
+
+<div>
+    <h2>Меню</h2>
+    <ul>
+        <li><a th:href="@{/books}">Каталог Книг</a></li> <!-- Ссылка на каталог книг - доступна всем -->
+
+        <!-- Ссылка на список авторов - доступна только аутентифицированным -->
+        <li sec:authorize="isAuthenticated()"><a th:href="@{/authors}">Список Авторов</a></li>
+
+        <!-- TODO: Добавить другие ссылки по мере реализации функционала -->
+        <!-- <li sec:authorize="isAuthenticated()"><a th:href="@{/my-profile}">Мой профиль</a></li> -->
+        <!-- <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin}">Панель администратора</a></li> -->
+        <!-- <li sec:authorize="hasAnyRole('ADMIN', 'LIBRARIAN')"><a th:href="@{/loans}">Выдачи книг</a></li> -->
+    </ul>
+</div>
+
+<hr> <!-- Горизонтальная линия -->
+
+<!-- Форма выхода (видна только аутентифицированным пользователям) -->
 <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
     <button type="submit">Выйти</button>
 </form>
 
-<!-- TODO: Добавить ссылки на каталог книг, профиль, админку (если есть права) -->
 
 </body>
 </html>

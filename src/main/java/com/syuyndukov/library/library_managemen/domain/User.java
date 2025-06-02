@@ -45,6 +45,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean enabled = true;//флаг для секюрити (активен ли пользователь, по умолчанию да)
 
+
     // Связь Многие-ко-Многим с Role (управляющая сторона)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

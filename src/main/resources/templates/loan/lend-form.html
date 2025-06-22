@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Выдать Книгу</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<h1>Выдать Книгу</h1>
+
+<!-- Сообщения (успех/ошибка) -->
+<div th:if="${successMessage}" style="color: green;"><p th:text="${successMessage}"></p></div>
+<div th:if="${errorMessage}" style="color: red;"><p th:text="${errorMessage}"></p></div>
+
+
+<!-- Форма выдачи книги -->
+<!-- Отправляем POST запрос на /loans/lend -->
+<form th:object="${loanForm}" th:action="@{/loans/lend}" method="post">
+
+    <!-- CSRF токен -->
+
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
+    <!-- Ошибка, если остаемся на форме из-за общей ошибки -->
+    <div th:if="${#fields.hasErrors('global')}" style="color: red;"><p th:errors="*{global}"></p></div>
+
+    <!-- Поле для выбора Книги -->
+    <div>
+        <label for="bookId">Книга:</label>
+        <!-- th:field="*{bookId}" свяжет выбранное значение (ID книги) с полем bookId в DTO -->
+        <select id="bookId" th:field="*{bookId}" required>
+            <option value="">-- Выберите книгу --</option> <!-- Пустая опция по умолчанию -->
+            <!-- Перебираем список всех книг из model.allBooks -->
+            <option th:each="book : ${allBooks}"
+                    th:value="${book.id}"
+            th:text="${book.title} + ' (' + ${book.isbn} + ')'"
+            ></option>
+        </select>
+        <!-- Отображение ошибок валидации для поля bookId -->
+        <span th:if="${#fields.hasErrors('bookId')}" th:errors="*{bookId}" style="color: red;">Ошибка выбора книги</span>
+    </div>
+
+    <!-- Поле для выбора Пользователя (читателя) -->
+    <div>
+        <label for="userId">Читатель:</label>
+        <!-- th:field="*{userId}" свяжет выбранное значение (ID пользователя) с полем userId в DTO -->
+        <select id="userId" th:field="*{userId}" required>
+            <option value="">-- Выберите читателя --</option> <!-- Пустая опция по умолчанию -->
+            <!-- Перебираем список всех пользователей из model.allUsers -->
+            <option th:each="user : ${allUsers}"
+                    th:value="${user.id}"
+                    th:text="${user.firstName} + ' ' + ${user.lastName} + ' (' + ${user.username} + ')'"
+            ></option>
+        </select>
+        <!-- Отображение ошибок валидации для поля userId -->
+        <span th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}" style="color: red;">Ошибка выбора читателя</span>
+    </div>
+
+    <div>
+        <button type="submit">Оформить Выдачу</button>
+    </div>
+</form>
+
+<p><a href="/loans">К активным выдачам</a></p>
+<p><a href="/">На главную</a></p>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ошибка</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<h1>Произошла ошибка</h1>
+
+<!-- Отображение HTTP статуса, если он передан в модели -->
+<div th:if="${status}">
+    <p><strong>Статус ошибки:</strong> <span th:text="${status}">500</span></p>
+</div>
+<!-- Или можно использовать стандартный атрибут статуса ошибки из HttpServletRequest -->
+<!-- <div th:if="${#request.getAttribute('jakarta.servlet.error.status_code')}">
+    <p><strong>Статус ошибки:</strong> <span th:text="${#request.getAttribute('jakarta.servlet.error.status_code')}"></span></p>
+</div> -->
+
+
+<!-- Отображение сообщения об ошибке, переданного из обработчика -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p><strong>Сообщение:</strong> <span th:text="${errorMessage}"></span></p>
+</div>
+<div th:unless="${errorMessage}">
+    <p>Извините, при обработке вашего запроса возникла проблема.</p>
+</div>
+
+<!-- TODO: Возможно, отобразить путь запроса: th:text="${#request.getAttribute('jakarta.servlet.error.request_uri')}" -->
+
+
+<p><a href="/">На главную</a></p>
+
+</body>
+</html>

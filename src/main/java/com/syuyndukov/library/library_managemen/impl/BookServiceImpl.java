@@ -5,6 +5,9 @@ import com.syuyndukov.library.library_managemen.domain.lib.Book;
 import com.syuyndukov.library.library_managemen.dto.lib.BookCreationDto;
 import com.syuyndukov.library.library_managemen.dto.lib.BookResponseDto;
 import com.syuyndukov.library.library_managemen.dto.lib.BookUpdateDto;
+import com.syuyndukov.library.library_managemen.exeption.AuthorNotFoundException;
+import com.syuyndukov.library.library_managemen.exeption.BookNotFoundException;
+import com.syuyndukov.library.library_managemen.exeption.BookUnavailableException;
 import com.syuyndukov.library.library_managemen.mapper.BookMapper;
 import com.syuyndukov.library.library_managemen.repository.AuthorRepository;
 import com.syuyndukov.library.library_managemen.repository.BookRepository;
@@ -13,10 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -38,12 +38,13 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public BookResponseDto createBook(BookCreationDto bookDto) {
+
         Book book = bookMapper.toEntity(bookDto);
 
         Set<Author> authors = new HashSet<>();
         if (bookDto.getAuthorIds() == null && !bookDto.getAuthorIds().isEmpty()){
             authors = bookDto.getAuthorIds().stream().map(authorId -> authorRepository.findById(authorId)
-                    .orElseThrow(() -> new RuntimeException("Author not found with id: " + authorId)))
+                    .orElseThrow(() -> new AuthorNotFoundException("Author not found with id: " + authorId)))
                     .collect(Collectors.toSet());
         }
 //        else {
@@ -64,10 +65,37 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findByIsbn(isbn).map(bookMapper::toDto);
     }
 
+    /**
+    * Поиск книг по запросу (по названию или автору).
+    * Ищет книги, название которых содержит запрос, или книги, написанные авторами, чье имя содержит запрос.
+    *  @param query Строка запроса для поиска.
+    */
     @Override
     public List<BookResponseDto> searchBooks(String query) {
-        List<Book> books = bookRepository.findByTitleContainingIgnoreCase(query);
-        return bookMapper.toDtoList(books);
+        if(query == null || query.trim().isEmpty()){
+            return findAllBooks();
+        }
+
+        String lowerCaseQuery = query.trim().toLowerCase();
+
+        List<Book> booksByTitle = bookRepository.findByTitleContainingIgnoreCase(lowerCaseQuery);
+
+        List<Author> authorsByTitle = authorRepository.findByFullNameContainingIgnoreCase(lowerCaseQuery);
+
+        Set<Book> booksByAuthors = new HashSet<>();
+
+        if (authorsByTitle != null && !authorsByTitle.isEmpty()){
+            booksByAuthors = authorsByTitle.stream()
+                    .flatMap(author -> author.getBooks().stream())
+                    .collect(Collectors.toSet());
+
+        }
+        Set<Book> combinedBooks = new LinkedHashSet<>(booksByTitle);
+        combinedBooks.addAll(booksByAuthors);
+
+        List<Book> finalBookList = combinedBooks.stream().toList();
+
+        return bookMapper.toDtoList(finalBookList);
     }
 
     @Override
@@ -80,17 +108,17 @@ public class BookServiceImpl implements BookService {
     @Transactional
     public BookResponseDto updateBook(Long id, BookUpdateDto bookDetails) {
         Book bookToUpdate = bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+                .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + id));
 
         bookMapper.updateEntityFromDto(bookDetails, bookToUpdate);
 
         if (bookDetails.getAuthorIds() == null || bookDetails.getAuthorIds().isEmpty()) {
-            throw new RuntimeException("Book must have at least one author after update.");
+            throw new BookUnavailableException("Book must have at least one author after update.");
         }
 
         Set<Author> authors = bookDetails.getAuthorIds().stream()
                 .map(authorId -> authorRepository.findById(authorId)
-                        .orElseThrow(() -> new RuntimeException("Author not found with id: " + authorId)))
+                        .orElseThrow(() -> new AuthorNotFoundException("Author not found with id: " + authorId)))
                 .collect(Collectors.toSet());
 
         bookToUpdate.getAuthors().clear();

@@ -28,18 +28,6 @@ public class BookController {
     private final BookService bookService;
     private final AuthorService authorService;
 
-    /**
-     * Отображает каталог книг.
-     * Согласно ТЗ: доступно всем ролям (и, возможно, неаутентифицированным?).
-     * Начнем с доступа для всех (permitAll).
-     */
-    @GetMapping
-    @PreAuthorize("permitAll()")
-    public String listBook(Model model){
-        List<BookResponseDto> list = bookService.findAllBooks();
-        model.addAttribute("books", list);
-        return "book/list";
-    }
 
     /**
      * Отображает форму создания новой книги.
@@ -193,5 +181,27 @@ public class BookController {
             redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при удалении книги: " + e.getMessage());
         }
         return "redirect:/books";
+    }
+
+    /**
+     * Отображает каталог книг ИЛИ результаты поиска.
+     * Принимает необязательный параметр запроса 'query' для поиска.
+     * Доступно всем (permitAll).
+     */
+    @GetMapping
+    @PreAuthorize("permitAll()")
+    public String listBooks(@RequestParam(value = "query", required = false) String query, Model model){
+        List<BookResponseDto> books;
+        if (query != null && !query.trim().isEmpty()){
+            books = bookService.searchBooks(query);
+            model.addAttribute("searchQuery", query);
+            System.out.println("Выполнен поиск по запросу: " + query);
+        }else {
+            books = bookService.findAllBooks();
+            System.out.println("Отображен полный каталог. Так как нет совпадений");
+        }
+        model.addAttribute("books", books);
+
+        return "book/list";
     }
 }

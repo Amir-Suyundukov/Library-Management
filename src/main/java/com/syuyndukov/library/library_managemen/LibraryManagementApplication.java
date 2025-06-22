@@ -63,6 +63,7 @@ public class LibraryManagementApplication {
 				Long adminUserId = userCreateDto.getId();
 
 				userService.assignRoleToUser(adminUserId, "ADMIN");//назначаем роль
+				userService.assignRoleToUser(adminUserId, "LIBRARIAN");//назначаем роль
 
 				System.out.println("Тестовый пользователь 'admin' создан и назначена роль ADMIN");
 

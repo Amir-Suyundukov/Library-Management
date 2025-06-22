@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои Книги</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<h1>Мои Книги на руках</h1>
+
+<!-- TODO: Возможно, отобразить приветствие пользователю -->
+<!-- <p>Привет, <span th:text="${currentUser.fullName}">Имя Пользователя</span>!</p> -->
+
+<!-- Сообщения (успех/ошибка) - если перенаправляли с сообщениями -->
+<div th:if="${successMessage}" style="color: green;"><p th:text="${successMessage}"></p></div>
+<div th:if="${errorMessage}" style="color: red;"><p th:text="${errorMessage}"></p></div>
+
+
+<!-- Таблица со списком моих активных выдач -->
+<table border="1">
+    <thead>
+    <tr>
+        <th>Книга</th>
+        <th>Дата Выдачи</th>
+        <th>Вернуть до</th>
+        <th>Статус</th> <!-- На руках или Просрочено -->
+        <th>Дней просрочки</th>
+        <th>Действия</th>
+        <!-- TODO: Возможно, добавить столбец действий, если читатель может что-то делать с выдачей (например, продлить? сообщить о потере?) -->
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Перебираем список моих активных выдач из модели -->
+
+    <tr th:each="loan : ${myActiveLoans}">
+        <td>
+            <!-- Отображаем информацию о книге и ссылку на ее детали -->
+            <a th:href="@{/books/{id}(id=${loan.book.id})}" th:text="${loan.book.title}">Название книги</a>
+            <!-- TODO: Отобразить авторов книги -->
+            <!-- <br><small>Автор: <span th:each="author : ${loan.book.authors}" th:text="${author.fullName} + '; '">Автор ФИО</span></small> -->
+        </td>
+        <td th:text="${loan.issueDate}">2023-10-26</td> <!-- Дата выдачи -->
+        <td th:text="${loan.dueDate}">2023-11-09</td> <!-- Вернуть до -->
+        <td>
+            <!-- Отображаем статус на основе полей overdue из DTO (returnDate null для активных) -->
+            <span th:if="${!loan.overdue}">На руках</span>
+            <span th:if="${loan.overdue}" style="color: red; font-weight: bold;">Просрочено</span>
+        </td>
+        <td th:text="${loan.overdue ? loan.daysOverdue : 0}">0</td> <!-- Дней просрочки (только если просрочено) -->
+        <!-- TODO: Добавить действия -->
+        <td>
+            <span sec:authorize="isAuthenticated()"> <!-- <--- Этот блок виден всем залогиненным (включая READER) -->
+                     <form th:action="@{/loans/return/{id}(id=${loan.id})}" method="post" th:if="${!loan.returned}">
+                         <!-- CSRF токен -->
+                          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                         <button type="submit" onclick="return confirm('Оформить возврат?');">Вернуть книгу</button>
+                     </form>
+                 </span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- TODO: Ссылка на историю выдач -->
+<!-- <p sec:authorize="isAuthenticated()"><a th:href="@{/my-loans/history}">История выдач</a></p> -->
+
+
+<p><a href="/">На главную</a></p>
+
+</body>
+</html>

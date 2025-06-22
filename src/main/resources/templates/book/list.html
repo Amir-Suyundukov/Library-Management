@@ -20,6 +20,15 @@
 <!-- TODO: Форма поиска -->
 <!-- <form th:action="@{/books/search}" method="get"> ... </form> -->
 
+<form th:action="@{/books}" method="get"> <!-- Отправляем GET запрос на /books -->
+  <div>
+    <label for="query">Поиск:</label>
+    <!-- th:value="${searchQuery}" предзаполняет поле последним запросом -->
+    <input type="text" id="query" name="query" th:value="${searchQuery}" placeholder="Название или автор">
+    <button type="submit">Найти</button>
+  </div>
+</form>
+
 <!-- Таблица со списком книг -->
 <table border="1">
   <thead>
@@ -43,7 +52,6 @@
     <td th:text="${book.publicationYear}">2023</td>
     <td th:text="${book.copies}">5</td>
     <!-- TODO: Отображение авторов (book.authors - это Set<AuthorResponseDto>) -->
-    <!-- <td><span th:each="author : ${book.authors}" th:text="${author.fullName} + '; '">Автор1; Автор2;</span></td> -->
     <td>
       <!-- Ссылка на детали книги -->
       <a th:href="@{/books/{id}(id=${book.id})}">Подробнее</a>

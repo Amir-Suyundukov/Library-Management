@@ -27,15 +27,21 @@
 <div>
     <h2>Меню</h2>
     <ul>
-        <li><a th:href="@{/books}">Каталог Книг</a></li> <!-- Ссылка на каталог книг - доступна всем -->
+        <li><a th:href="@{/books}">Каталог Книг</a></li>
 
         <!-- Ссылка на список авторов - доступна только аутентифицированным -->
         <li sec:authorize="isAuthenticated()"><a th:href="@{/authors}">Список Авторов</a></li>
 
+        <!-- --- ДОБАВЛЯЕМ ССЫЛКУ "Мои Книги"! --- -->
+        <!-- Доступна только аутентифицированным пользователям -->
+        <li sec:authorize="isAuthenticated()"><a th:href="@{/loans/my-books}">Мои Книги</a></li>
+        <!-- --------------------------------------- -->
+
+        <!-- --- ДОБАВЛЯЕМ ССЫЛКУ НА СПИСОК АКТИВНЫХ ВЫДАЧ! --- -->
+        <!-- Доступна только пользователям с ролью LIBRARIAN или ADMIN -->
+        <li sec:authorize="hasAnyRole('ADMIN', 'LIBRARIAN')"><a th:href="@{/loans}">Активные Выдачи (для Библиотекаря)</a></li>
+
         <!-- TODO: Добавить другие ссылки по мере реализации функционала -->
-        <!-- <li sec:authorize="isAuthenticated()"><a th:href="@{/my-profile}">Мой профиль</a></li> -->
-        <!-- <li sec:authorize="hasRole('ADMIN')"><a th:href="@{/admin}">Панель администратора</a></li> -->
-        <!-- <li sec:authorize="hasAnyRole('ADMIN', 'LIBRARIAN')"><a th:href="@{/loans}">Выдачи книг</a></li> -->
     </ul>
 </div>
 

@@ -1,0 +1,15 @@
+body {
+    font-family: sans-serif;
+    margin: 20px;
+}
+h1 {
+    color: navy;
+}
+table {
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+th, td {
+    border: 1px solid grey;
+    padding: 5px;
+}
